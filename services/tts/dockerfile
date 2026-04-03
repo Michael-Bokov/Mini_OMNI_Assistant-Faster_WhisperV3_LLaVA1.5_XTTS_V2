@@ -1,0 +1,24 @@
+FROM python:3.10-slim
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    espeak-ng \
+    gcc \
+    g++ \
+    git \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install  --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir torch==2.4.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cpu
+COPY requirements.txt .
+
+RUN pip3 install --no-cache-dir  -r requirements.txt
+
+COPY main.py .
+
+EXPOSE 8003
+CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003"] 

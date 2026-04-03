@@ -1,0 +1,58 @@
+# --- Секреты и локальная конфигурация ---
+.env
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Данные и артефакты Docker (тома из compose) ---
+models/
+outputs/
+
+# --- Архивы и большие бинарники ---
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+
+# --- Логи ---
+*.log
+logs/
+
+# --- IDE / ОС ---
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Прочее ---
+*.tmp
+*.temp
+.cache/
+universal_assistant_old/
+media/
+services/universal_assistant/static/index_black.html
+services/universal_assistant/static/script_black.js

@@ -1,0 +1,69 @@
+services:
+  asr:
+    build: ./services/asr
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./models:/root/.cache/huggingface
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 8G
+
+  vlm:
+    build: ./services/vlm
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./models:/root/.cache/huggingface
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 8G
+
+  tts:
+    build: ./services/tts
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./models/xtts:/root/.local/share/tts #модель на хосте #./models/ru_vits:/app/model_ru #./models:/root/.cache/torch
+    environment:
+      - CUDA_VISIBLE_DEVICES=""
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  universal_assistant:
+    build: ./services/universal_assistant
+    ports:
+      - "5000:5000"
+    environment:
+      - ASR_URL=http://asr:8001
+      - VLM_URL=http://vlm:8002
+      - TTS_URL=http://tts:8003
+    depends_on:
+      - asr
+      - vlm
+      - tts
+    volumes:
+      - ./services/universal_assistant/static:/app/static
+      - ./outputs:/app/outputs
+    deploy:
+      resources:
+        limits:
+          memory: 1G 

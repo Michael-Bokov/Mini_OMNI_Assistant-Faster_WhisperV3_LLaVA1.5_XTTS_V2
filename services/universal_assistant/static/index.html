@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Assistant</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f9fafb;
+            --sidebar: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --user-bg: #eff6ff;
+            --assistant-bg: #f3f4f6;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .app {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1280px;
+            margin: 0 auto;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            background: var(--sidebar);
+        }
+        .sidebar {
+            width: 340px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border);
+            background: var(--sidebar);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .brand {
+            font-weight: 600;
+            font-size: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand span {
+            display: block;
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        .sidebar label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+        }
+        .sidebar select,
+        .sidebar input[type="file"],
+        .sidebar button {
+            width: 100%;
+            font-size: 17px;
+            border-radius: 8px;
+            border: 3px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            padding: 8px 10px;
+        }
+        .sidebar button {
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .sidebar button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .sidebar button.primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        .sidebar button.secondary:hover:not(:disabled) {
+            background: #f9fafb;
+        }
+        .sidebar button.danger {
+            border-color: #fecaca;
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+        .sidebar button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .sidebar .spacer { flex: 1; min-height: 8px; }
+        .status {
+            font-size: 12px;
+            color: var(--muted);
+            min-height: 32px;
+            line-height: 1.4;
+        }
+        .status.error { color: var(--danger); }
+        .audio-wrap {
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+        .audio-wrap audio {
+            width: 100%;
+            height: 36px;
+        }
+
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: var(--bg);
+        }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .msg {
+            max-width: min(720px, 92%);
+            border-radius: 12px;
+            padding: 12px 14px;
+            line-height: 1.5;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+        .msg.user {
+            align-self: flex-end;
+            background: var(--user-bg);
+            border-color: #bfdbfe;
+        }
+        .msg.assistant {
+            align-self: flex-start;
+            background: var(--assistant-bg);
+        }
+        .meta {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        .composer {
+            border-top: 1px solid var(--border);
+            padding: 16px 24px;
+            background: var(--sidebar);
+        }
+        .composer textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 88px;
+            max-height: 240px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: #fff;
+        }
+        .composer textarea:focus {
+            outline: none;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .composer-hint {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        @media (max-width: 720px) {
+            .app { flex-direction: column; border: none; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                Universal Assistant
+                <span>Язык, изображение, запись</span>
+            </div>
+
+            <div>
+                <label for="languageSelect">Язык ответа</label>
+                <select id="languageSelect">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="imageInput">Изображение</label>
+                <input id="imageInput" type="file" accept="image/*">
+            </div>
+
+            <button id="recordBtn" type="button" class="secondary">Начать запись</button>
+            <button id="sendBtn" type="button" class="primary">Отправить</button>
+
+            <div id="status" class="status"></div>
+            <div class="spacer"></div>
+            <div class="audio-wrap">
+                <audio id="responseAudio" controls></audio>
+            </div>
+        </aside>
+
+        <main class="chat-panel">
+            <div id="messages" class="messages">
+                <div class="msg assistant">
+                    Задайте вопрос текстом или голосом. При необходимости прикрепите изображение — ответ будет текстом и озвучкой.
+                </div>
+            </div>
+            <div class="composer">
+                <textarea id="promptInput" placeholder="Введите сообщение…"></textarea>
+                <div class="composer-hint">Ctrl+Enter — отправить</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
